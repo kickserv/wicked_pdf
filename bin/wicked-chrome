@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require 'thor'
+require 'wicked_pdf'
+
+class WickedChrome < Thor
+  CHROME_DIR = File.join(File.expand_path(File.dirname(__FILE__)), 'chrome') 
+
+  desc "dependencies", "download dependencies"
+  def dependencies
+    Dir.chdir(CHROME_DIR) do
+      `npm install`
+    end    
+  end
+
+  desc 'pdf', 'run chrome'
+  def pdf(*args)
+    Dir.chdir(CHROME_DIR) do
+      `node wicked-chrome.js print #{args.join(' ')}`
+    end
+  end
+
+end
+
+WickedChrome.start(ARGV)
+

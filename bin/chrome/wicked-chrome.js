@@ -1,0 +1,98 @@
+// Borrowed from https://github.com/JarvusInnovations/puppeteer-cli for testing purposes. Will replace
+
+const puppeteer = require('puppeteer');
+
+const argv = require('yargs')
+    .command({
+        command: 'print <input> <output>',
+        desc: 'Print an HTML file or URL to PDF',
+        builder: {
+            background: {
+                boolean: true,
+                default: true
+            },
+            'margin-top': {
+                default: '6.25mm'
+            },
+            'margin-right': {
+                default: '6.25mm'
+            },
+            'margin-bottom': {
+                default: '14.11mm'
+            },
+            'margin-left': {
+                default: '6.25mm'
+            },
+            format: {
+                default: 'Letter'
+            },
+            timeout: {
+                default: 30 * 1000,
+                number: true,
+            },
+            landscape: {
+                boolean: true,
+                default: false
+            }
+        },
+        handler: async argv => {
+            try {
+                await print(argv);
+            } catch (err) {
+                console.error('Failed to generate pdf:', err);
+                process.exit(1);
+            }
+        }
+    }).command({
+        command: 'screenshot <input> <output>',
+        desc: 'Take screenshot of an HTML file or URL to PNG',
+        builder: {
+            'full-page': {
+                boolean: true,
+                default: true
+            },
+            'omit-background': {
+                boolean: true,
+                default: false
+            }
+        },
+        handler: async argv => {
+            try {
+                await screenshot(argv);
+            } catch (err) {
+                console.error('Failed to take screenshot:', err);
+                process.exit(1);
+            }
+        }
+    })
+    .demandCommand()
+    .help()
+    .argv;
+
+async function print(argv) {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    const url = argv.input;
+
+    console.log(`Loading ${url}`);
+    await page.goto(url, {
+        timeout: argv.timeout
+    });
+
+    console.log(`Writing ${argv.output}`);
+    await page.pdf({
+        path: argv.output,
+        format: argv.format,
+        landscape: argv.landscape,
+        printBackground: argv.background,
+        margin: {
+            top: argv.marginTop,
+            right: argv.marginRight,
+            bottom: argv.marginBottom,
+            left: argv.marginLeft
+        }
+    });
+
+    console.log('Done');
+    await browser.close();
+}

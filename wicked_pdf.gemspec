@@ -20,13 +20,14 @@ Gem::Specification.new do |spec|
 DESC
 
   spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.executables   = ['wicked-chrome', 'download-wicked-chrome-dependencies']
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
   spec.requirements << 'wkhtmltopdf'
 
   spec.add_dependency 'activesupport'
+  spec.add_dependency 'thor'
 
   spec.add_development_dependency 'rails'
   spec.add_development_dependency 'bundler', '~> 1.3'
